@@ -7,7 +7,7 @@ This docker image provides a Minecraft server with several basic command you can
 
 To simply run the container : 
   ```
-  docker run -d -p 25565:25565 --name minecraft-server dewaela/minecraft-server
+  docker run -dt -p 25565:25565 --name minecraft-server dewaela/minecraft-server
   ```
 where the standard server port, 25565, will be exposed on your host machine.
 
