@@ -1,0 +1,66 @@
+#!/bin/sh
+
+LIST_USERS=$(cat banned-players.json | grep "name" | cut -d '"' -f 4)
+
+usage() {
+    echo "ban : Handle banned players"
+    echo
+    echo "Usage : ban [-l | -h]"
+    echo "   or : ban [-a | -d] [login]"
+    echo "   or : ban -d --all"
+    echo "    - handle banned players"
+    echo
+    echo " Options :"
+    echo "   -h | --help	Show this help message"
+    echo "   -l | --list	List all banned users"
+    echo "   -a | --add         Ban a user"
+    echo "   -d | --delete      Unban a user"
+    echo "   --all              All users"
+    echo
+}
+
+ban_user() {
+    echo "Banning $1..."
+    tmux send -t spigot "ban $1" ENTER
+    sleep 3s
+    if echo "$LIST_USERS" | grep -q "$1" ; then
+	echo "$1 banned"
+    else
+	echo "$1 cannot be banned"
+    fi
+}
+
+unban_user() {
+    echo "Unbanning $1..."
+    tmux send -t spigot "pardon $1" ENTER
+    sleep 3s
+    if ! echo "$LIST_USERS" | grep -q "$1"; then
+	echo "$1 unbanned"
+    else
+	echo "$1 cannot be unbanned"
+    fi
+}
+
+unban_all_user() {
+    echo $LIST_USERS | tr " " "\n" | while read -r line; do
+	unban_user "$line"
+    done
+}
+
+unban() {
+    if [ "$1" = "--all" ]; then
+	unban_all_user
+    else
+	unban_user "$1"
+    fi
+}
+
+if test $# -ne 0; then
+    case "$1" in
+	"-h"|"--help") usage;;
+	"-l"|"--list") echo $LIST_USERS | tr " " "\n";;
+	"-a"|"--add") ban_user "$2";;
+	"-d"|"--delete") unban "$2";;
+	*) echo "Unknow command $1. Execute --help for more information";;
+    esac
+fi

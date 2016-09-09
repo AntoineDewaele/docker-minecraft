@@ -1,0 +1,23 @@
+#!/bin/sh
+
+usage() {
+    echo "reboot : Reboot minecraft server"
+    echo
+    echo "Usage : reboot"
+    echo "   or : reboot [-h | -s]"
+    echo
+    echo " Options :"
+    echo "   -h | --help	Show this help message"
+    echo "   -s | --say		Say something before reboot"
+    echo
+}
+
+if test $# -ne 0; then
+    case "$1" in
+	"-h"|"--help") usage;;
+	"-s"|"--say") stop -s "$1";;
+    esac
+else
+    stop
+fi
+start

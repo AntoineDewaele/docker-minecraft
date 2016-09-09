@@ -1,0 +1,65 @@
+#!/bin/sh
+
+LIST_USERS=$(cat ops.json | grep "name" | cut -d '"' -f 4)
+
+usage() {
+    echo "ops : Handle server operators"
+    echo
+    echo "Usage : ops [-l | -h]"
+    echo "   or : ops [-a | -d] [login]"
+    echo "   or : ops -d --all"
+    echo "    - handle who can have the operator role"
+    echo
+    echo " Options:"
+    echo "   -h | --help               Show this help message"
+    echo "   -l | --list               List all user in the withe_list"
+    echo "   -a | --add                Add a user to the white_list"
+    echo "   -d | --delete             Delete a user from the white_list"
+    echo "   --all                     All users"
+    echo
+}
+
+add_user() {
+    echo "Adding $1 to ops..."
+    tmux send -t spigot "op $1" ENTER
+    sleep 3s
+    if echo "$LIST_USERS" | grep -q "$1" ; then
+	echo "$1 added to ops"
+    else
+	echo "$1 cannot be added to ops"
+    fi
+}
+
+delete_user() {
+    echo "Deleting $1 from ops..."
+    tmux send -t spigot "deop $1" ENTER
+    sleep 3s
+    if ! echo "$LIST_USERS" | grep -q "$1"; then
+	echo "$1 deleted from ops"
+    else
+	echo "$1 cannot be deleted from ops"
+    fi
+}
+
+delete_all_user() {
+    echo $LIST_USER | tr "" "\n" | while read -r line; do
+	delete_user "$1"
+    done
+}
+
+delete() {
+    if [ "$1" = "--all" ]; then
+	delete_all_users
+    else
+	delete_user "$1"
+    fi
+}
+
+if test $# -ne 0; then
+    case "$1" in
+	"-h"|"--help") usage;;
+	"-l"|"--list") echo $LIST_USERS | tr " " "\n";;
+	"-a"|"--add") add_user "$2";;
+	"-d"|"--delete") delete "$2";;
+    esac
+fi

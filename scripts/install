@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TMP_DIR=/home/minecraft/tmp
+
+mkdir $TMP_DIR
+wget -q -P $TMP_DIR https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+java -jar $TMP_DIR/BuildTools.jar --rev $VERSION 2>&1
+rm -rf $TMP_DIR

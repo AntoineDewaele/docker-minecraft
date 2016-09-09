@@ -1,0 +1,67 @@
+#!/bin/sh
+
+LIST_USERS=$(cat whitelist.json | grep "name" | cut -d '"' -f 4)
+
+usage() {
+    echo "white_list : Handle server white_list"
+    echo
+    echo "Usage : white_list [-l | -h]"
+    echo "   or : withe_list [-a | -d] [login]"
+    echo "   or : withe_list -d --all"
+    echo "    - handle who can access to the minecraft server"
+    echo
+    echo " Options:"
+    echo "   -h | --help               Show this help message"
+    echo "   -l | --list               List all user in the withe_list"
+    echo "   -a | --add                Add a user to the white_list"
+    echo "   -d | --delete             Delete a user from the white_list"
+    echo "   --all		       All users"
+    echo
+}
+
+add_user() {
+    echo "Adding $1 to whitelist..."
+    tmux send -t spigot "whitelist add $1" ENTER
+    sleep 3s
+    if echo "$LIST_USERS" | grep -q "$1" ; then
+	echo "$1 added to whitelist"
+    else
+	echo "$1 cannot be added to whitelist"
+    fi
+}
+
+delete_user() {
+    echo "Deleting $1 from whitelist..."
+    tmux send -t spigot "whitelist delete $1" ENTER
+    sleep 3s
+    if ! echo "$LIST_USERS" | grep -q "$1"; then
+	echo "$1 deleted from whitelist"
+    else
+	echo "$1 cannot be deleted from whitelist"
+    fi
+}
+
+delete_all_user() {
+    echo $LIST_USER | tr "" "\n" | while read -r line; do
+	delete_user "$1"
+    done
+}
+
+delete() {
+    if [ "$1" = "--all" ]; then
+	delete_all_users
+    else
+	delete_user "$1"
+    fi
+}
+
+
+if test $# -ne 0; then
+    case "$1" in
+	"-h"|"--help") usage;;
+	"-l"|"--list") echo $LIST_USERS | tr " " "\n";;
+	"-a"|"--add") add_user "$2";;
+	"-d"|"--delete") delete "$2";;
+	*) echo "Unknow command $1. Execute --help for more information";;
+    esac
+fi

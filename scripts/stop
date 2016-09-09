@@ -1,0 +1,46 @@
+#!/bin/sh
+
+usage() {
+    echo "stop : Stop minecraft server"
+    echo
+    echo "Usage : stop"
+    echo "   or : stop [-h | -s]"
+    echo
+    echo " Options :"
+    echo "   -h | --help	Show this help message"
+    echo "   -s | --say		Say something before stop"
+    echo
+}
+
+stop_minecraft() {
+    tmux send -t spigot "say Server will stop in 1 minute" ENTER
+    sleep 30s
+    tmux send -t spigot "say Server will stop in 30 seconds" ENTER
+    sleep 15s
+    tmux send -t spigot "say Saving map in progress..." ENTER
+    tmux send -t spigot save_all ENTER
+    sleep 5s
+    for seconds in $(seq 0 9); do
+	tmux send -t spigot "say Server is stopping in $seconds seconds" ENTER
+	sleep 1s
+    done
+    tmux send -t spigot stop ENTER
+}
+
+say() {
+    tmux send -t spigot "$1" ENTER
+}
+
+if pgrep "spigot"; then
+    echo "Server is not running"
+    exit
+fi
+if test $# -ne 0; then
+    case "$1" in
+	"-h"|"--help") usage;;
+	"-s"|"--say") say "$2"; stop_minecraft;;
+	*) echo "Unknow command $1. Execute --help for more information";;
+    esac
+else
+    stop_minecraft
+fi

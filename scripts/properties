@@ -1,0 +1,151 @@
+#!/bin/sh
+
+usage() {
+    echo "properties : Handle minecraft server properties"
+    echo
+    echo "Usage : properties [-l | -h]"
+    echo "   or : properties [-d | -p] [property]"
+    echo "   or : properties [-d | -p] --all"
+    echo "    - set property to value on server.properties file."
+    echo
+    echo "  Options :"
+    echo "    -h | --help                Show this help message"
+    echo "    -d | --default             Set property to default value"
+    echo "    -l | --list                List all minecraft server properties"
+    echo "    -p | --print               Print a property actual value"
+    echo "    --all			 All properties"
+    echo
+}
+
+list_all_properties() {
+
+    echo " -----------------------------------------------------------------------------------------------------------------------"
+    echo " |              Key            |      Type      |  Default |                        Description                        |"
+    echo " |---------------------------------------------------------------------------------------------------------------------|"
+    echo " | allow-flight                | boolean        | false    | Allow users to flight on server                           |"
+    echo " | allow-nether                | boolean        | true     | Allow player to travel to nether                          |"
+    echo " | announce-player-achievments | boolean        | true     | Allow server to announce achivements                      |"
+    echo " | difficulty                  | integer (1-3)  | 1        | Defines the server difficulty                             |"
+    echo " | enable-query                | boolean        | false    | Used to get information about server                      |"
+    echo " | enable-rcon                 | boolean        | false    | Enable remote access to server console                    |"
+    echo " | enable-command-block        | boolean        | false    | Enable command blocks                                     |"
+    echo " | force-gamemode              | boolean        | false    | Face players to join in a gamemode                        |"
+    echo " | gamemode                    | integer (0-3)  | 0        | Defines the mode of gameplay                              |"
+    echo " | generate-structures         | boolean        | true     | Defines whether structures will be generated              |"
+    echo " | generator-settings          | string         | blank    | The settings used to customize world generation           |"
+    echo " | hardcore                    | boolean        | false    | If set to true, players will be dead definitly            |"
+    echo " | level-name                  | string         | world    | Set the level and folder name                             |"
+    echo " | level-seed                  | string         | DEFAULT  | Add a seed to the world                                   |"
+    echo " | level-type                  | string         | DEFAULT  | DEFAULT / FLAT / LARGEBIOMES / AMPLIFIED                  |"
+    echo " | max-build-height            | integer        | 256      | Set the maximum height of the map                         |"
+    echo " | max-players                 | integer        | 20       | Set the maximum players on the server                     |"
+    echo " | max-tick-time               | integer        | 60000    | Set the maximum number of milliseconds per ticks          |"
+    echo " | max-world-size              | integer        | 29999984 | Set the maximum world size                                |"
+    echo " | motd                        | string         | DEFAULT  | Set the message displayed on the server list              |"
+    echo " | online-mode                 | boolean        | true     | Allow only account in Minecraft account database          |"
+    echo " | op-permission-level         | integer (1-4)  | 4        | Sets the default permission level for ops                 |"
+    echo " | player-idle-timeout         | integer        | 0        | Sets the timeout value                                    |"
+    echo " | pvp                         | boolean        | true     | Enable PvP on the server                                  |"
+    echo " | ressource-pack              | string         | blank    | Optional URI to a ressource pack                          |"
+    echo " | ressource-pack-sha1         | string         | blank    | Options SHA-1 digest of the resource pack                 |"
+    echo " | server-ip                   | string         | blank    | Set this if you want the server on a particular IP        |"
+    echo " | server-port                 | integer        | 25565    | Changes the port the server is hosting                    |"
+    echo " | snooper-enabled             | boolean        | true     | Sets whether the server sends snoop data                  |"
+    echo " | spawn-animals               | boolean        | true     | Determinate if animals will be able to spawn              |"
+    echo " | spawn-monsters              | boolean        | true     | Determinate if monsters will be spawned                   |"
+    echo " | spawn-npcs                  | boolean        | true     | Determinate whether villagers will be spawned             |"
+    echo " | spawn-protection            | integer        | 16       | Determinate the radius of spawn protection                |"
+    echo " | use-native-transport        | boolean        | true     | Linux server performance improvements                     |"
+    echo " | view-distance               | integer (2-32) | 10       | Sets the amount of world data the server sends the client |"
+    echo " | white-list                  | boolean        | true     | Enable withelist on the server                            |"
+    echo " -----------------------------------------------------------------------------------------------------------------------"
+
+}
+
+set_property() {
+    if [ -n "$1" ]; then
+	if pgrep "spigot"; then
+	    echo "Service is running, you must shutdown it before change properties..."
+	    exit
+	else
+	    echo "Setting $1 to $2"
+	    sed -i "/$1\s*=/ c $1=$2" "server.properties"
+	fi
+    fi
+}
+
+reset_to_default_value() {
+    case "$1" in
+	"generator-settings") set_property "$1" "";;
+	"op-permissions-level") set_property "$1" "4";;
+	"allow-nether") set_property "$1" true;;
+	"level-name") set_property "$1" world;;
+	"enable-query") set_property "$1" false;;
+	"allow-flight") set_property "$1" false;;
+	"announce-player-achievements") set_property "$1" true;;
+	"server-port") set_property "$1" 25565;;
+	"max-world-size") set_property "$1" 29999984;;
+	"level-type") set_property "$1" DEFAULT;;
+	"enable-rcon") set_property "$1" false;;
+	"level-seed") set_property "$1" "";;
+	"force-gamemode") set_property "$1" false;;
+	"server-ip") set_property "$1", "";;
+	"network-compression-threshold") set_property "$1", 256;;
+	"max-build-height") set_property "$1", 256;;
+	"spawn-npcs") set_property "$1", true;;
+	"hardcore") set_property "$1", false;;
+	"snooper-enabled") set_property "$1", true;;
+	"ressource-pack-sha1") set_property "$1", "";;
+	"online-mode") set_property "$1" true;;
+	"ressource-pack") set_property "$1" "";;
+	"pvp") set_property "$1" true;;
+	"difficulty") set_property "$1" 1;;
+	"enable-command-block") set_property "$1" false;;
+	"gamemode") set_property "$1" 1;;
+	"player-idle-timeout") set_property "$1" 0;;
+	"max-players") set_property "$1" 20;;
+	"max-tick-time") set_property "$1" 60000;;
+	"spawn-monsters") set_property "$1" true;;
+	"generate-structures") set_property "$1" true;;
+	"view-distance") set_property "$1" 10;;
+	"motd") set_property "$1" "A Minecraft Server";;
+    esac
+}
+
+reset_all_properties_to_default_value() {
+    while read line; do
+	reset_to_default_value "$line | cut -d '=' -f 2"
+    done < "server.properties"
+}
+
+default() {
+    if [ "$1" = "--all" ]; then
+	reset_all_properties_to_default_value
+    else
+	reset_to_default_value "$1"
+    fi
+}
+
+print_property() {
+    if [ -n "$1" ]; then
+	cat "server.properties" | grep "$1"
+    fi
+}
+
+print() {
+    if [ "$1" = "--all" ]; then
+	cat "server.properties"
+    else
+	print_property "$1"
+    fi
+}
+
+if test $# -ne 0; then
+    case "$1" in
+	"-h"|"--help") usage;;
+	"-d"|"--default") default "$2";;
+	"-l"|"--list") list_all_properties;;
+	"-p"|"--print") print "$2";;
+	*) echo "Unknow command $1. Execute --help for more information";;
+    esac
+fi

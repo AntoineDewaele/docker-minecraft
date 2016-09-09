@@ -1,0 +1,67 @@
+#!/bin/sh
+
+LIST_IPS=$(cat banned-ips.json | grep "ip" | cut -d '"' -f 4)
+
+usage() {
+    echo "banip : Handle banned ips"
+    echo
+    echo "Usage : banip [-l | -h]"
+    echo "   or : banip [-a | -d] [login]"
+    echo "   or : banip -d --all"
+    echo "    - handle banned ips"
+    echo
+    echo " Options:"
+    echo "   -h | --help        Show this help message"
+    echo "   -l | --list        List all banned ips"
+    echo "   -a | --add         Ban an ip"
+    echo "   -d | --delete      Unban an ip"
+    echo "   --all		All users"
+    echo
+}
+
+ban_user() {
+    echo "Banning $1..."
+    tmux send -t spigot "ban $1" ENTER
+    sleep 3s
+    if echo "$LIST_USERS" | grep -q "$1" ; then
+	echo "$1 banned"
+    else
+	echo "$1 cannot be banned"
+    fi
+}
+
+unban_user() {
+    echo "Unbanning $1..."
+    tmux send -t spigot "pardon $1" ENTER
+    sleep 3s
+    if ! echo "$LIST_USERS" | grep -q "$1"; then
+	echo "$1 unbanned"
+    else
+	echo "$1 cannot be unbanned"
+    fi
+}
+
+unban_all_user() {
+    echo $LIST_IPS | tr " " "\n" | while read -r line; do
+	echo "$line"
+	unban_user "$line"
+    done
+}
+
+unban() {
+    if [ "$1" = "--all" ]; then
+	unban_all_user
+    else
+	unban_user "$1"
+    fi
+}
+
+if test $# -ne 0; then
+    case "$1" in
+	"-h"|"--help") usage;;
+	"-l"|"--list") echo $LIST_IPS | tr " " "\n";;
+	"-a"|"--add") ban_user "$2";;
+	"-d"|"--delete") unban "$2";;
+	*) echo "Unknow command $1. Execute --help for more information";;
+    esac
+fi

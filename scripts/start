@@ -1,0 +1,36 @@
+#!/bin/sh
+
+usage() {
+    echo "start : Start minecraft server"
+    echo
+    echo "Usage : start"
+    echo "   or : start -h"
+    echo
+    echo " Options :"
+    echo "   -h | --help	Show this help message"
+    echo
+}
+
+start_minecraft() {
+    if [ ! -e spigot-$VERSION.jar ]; then
+	install
+    fi
+
+    echo "# Generated via Docker on $(date)" > eula.txt
+    echo "eula=true" >> eula.txt
+
+    if pgrep "spigot"; then
+	echo "Service is already running"
+    else
+	tmux new -s spigot java -server "-Xmx${MAX_MEM}M" -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSIncrementalPacing "-XX:ParallelGCThreads=${NB_THREAD}" -XX:+AggressiveOpts -jar spigot-1.10.2.jar nogui
+    fi
+}
+
+if test $# -ne 0; then
+    case "$1" in
+	"-h"|"--help") usage;;
+	*) echo "Unknow command $1. Execute --help for more information";;
+    esac
+else
+    start_minecraft
+fi
