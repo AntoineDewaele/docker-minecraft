@@ -34,6 +34,8 @@ Here's the list of commands :
 ### Memory limit
 
 To adjust the java memory limit, you have to set the ```MIN_MEM``` and ```MAX_MEM``` :
-``` docker run -e 'MIN_MEM=1024' ... ```
+``` 
+docker run -e 'MIN_MEM=1024' ... 
+```
 
 
