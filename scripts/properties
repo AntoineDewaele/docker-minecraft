@@ -59,11 +59,10 @@ list_all_properties() {
     echo " | view-distance               | integer (2-32) | 10       | Sets the amount of world data the server sends the client |"
     echo " | white-list                  | boolean        | true     | Enable withelist on the server                            |"
     echo " -----------------------------------------------------------------------------------------------------------------------"
-
 }
 
 set_property() {
-    if [ -n "$1" ]; then
+    if [ -n "$1" ] && [ -n "$2" ]; then
 	if pgrep "spigot"; then
 	    echo "Service is running, you must shutdown it before change properties..."
 	    exit
@@ -71,6 +70,8 @@ set_property() {
 	    echo "Setting $1 to $2"
 	    sed -i "/$1\s*=/ c $1=$2" "server.properties"
 	fi
+    else
+	echo "Unknow command $1. Execute --help for more information"
     fi
 }
 
@@ -146,6 +147,6 @@ if test $# -ne 0; then
 	"-d"|"--default") default "$2";;
 	"-l"|"--list") list_all_properties;;
 	"-p"|"--print") print "$2";;
-	*) echo "Unknow command $1. Execute --help for more information";;
+	*) set_property "$1" "$2";;
     esac
 fi
