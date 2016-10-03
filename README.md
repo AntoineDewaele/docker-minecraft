@@ -1,7 +1,7 @@
 # minecraft-server
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/dewaela/minecraft-server.svg)](https://hub.docker.com/r/dewaela/minecraft-server/)
-[![Docker Stars](https://img.shields.io/docker/stars/dewaela/minecraft-server.svg?maxAge=2592000)](https://hub.docker.com/r/dewaela/minecraft-server/)
+[![Docker Stars](https://img.shields.io/docker/stars/dewaela/minecraft-server.svg?maxAge=2592000)](https://hub.docker.com/r/dewaela/minecraft-server/) [![](https://images.microbadger.com/badges/image/dewaela/minecraft-server.svg)](https://microbadger.com/images/dewaela/minecraft-server "Get your own image badge on microbadger.com")
 
 This docker image provides a Minecraft server with several basic command you can execute.
 
@@ -39,3 +39,4 @@ docker run -e 'MIN_MEM=1024' ...
 ```
 
 
+ 
